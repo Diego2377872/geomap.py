@@ -2,18 +2,18 @@ name: Keep Supabase Awake
 
 on:
   schedule:
-    - cron: '0 */12 * * *'   # Cada 12 horas
-  workflow_dispatch:          # Permite ejecutar manualmente desde la pestaña Actions
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Check repository
-        uses: actions/checkout@v4
-
       - name: Ping Supabase REST API
         run: |
-          curl -X HEAD "https://pqwysutcynzagdzozxua.supabase.co/rest/v1/" \
+          # Usamos GET a la raíz con timeout y limitamos la salida
+          curl -s -o /dev/null -w "%{http_code}\n" \
+            --max-time 10 \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            "https://pqwysutcynzagdzozxua.supabase.co/rest/v1/"
